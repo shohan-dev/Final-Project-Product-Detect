@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:smart_shop/ui/AppColors.dart';
+import 'package:smart_shop/ui/product_details_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -10,7 +13,62 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  var inputText = "";
+  String inputText = "";
+  List<QueryDocumentSnapshot> allProducts = [];
+  List<QueryDocumentSnapshot> displayedProducts = [];
+  Timer? _debounce;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAllProducts();
+  }
+
+  Future<void> _fetchAllProducts() async {
+    final snapshot =
+        await FirebaseFirestore.instance.collection("products").get();
+    setState(() {
+      allProducts = snapshot.docs;
+      displayedProducts =
+          allProducts.take(10).toList(); // Show first 3 products initially
+    });
+  }
+
+  void _onSearchChanged(String query) {
+    // Cancel previous timer if still running
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    // Start a new timer
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      setState(() {
+        inputText = query;
+        displayedProducts = _searchProducts(query);
+      });
+    });
+  }
+
+  List<QueryDocumentSnapshot> _searchProducts(String query) {
+    if (query.isEmpty) {
+      return allProducts
+          .take(10)
+          .toList(); // Show first 3 products if search is empty
+    }
+
+    return allProducts.where((document) {
+      Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+      String productName = data['product-name'].toLowerCase();
+      String product = data['product']
+          .toLowerCase(); // Assuming this is the field you're searching
+      return productName.contains(query.toLowerCase()) ||
+          product.contains(query.toLowerCase());
+    }).toList();
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +84,11 @@ class _SearchScreenState extends State<SearchScreen> {
           child: Column(
             children: [
               TextFormField(
-                onChanged: (val) {
-                  setState(() {
-                    inputText = val;
-                  });
-                },
+                onChanged: _onSearchChanged,
                 decoration: InputDecoration(
                   hintText: "Your product name . . .",
-                  prefixIcon: const Icon(Icons.search, color: AppColors.deep_blue),
+                  prefixIcon:
+                      const Icon(Icons.search, color: AppColors.deep_blue),
                   filled: true,
                   fillColor: Colors.grey[200],
                   border: OutlineInputBorder(
@@ -44,44 +99,29 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
               const SizedBox(height: 20),
               Expanded(
-                child: Container(
-                  child: StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection("products")
-                        .where("product-name", isEqualTo: inputText)
-                        .snapshots(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.hasError) {
-                        return const Center(
-                          child: Text("Something went wrong"),
-                        );
-                      }
+                child: Builder(
+                  builder: (BuildContext context) {
+                    if (displayedProducts.isEmpty && inputText.isNotEmpty) {
+                      return const Center(
+                        child: Text(
+                          "No products found",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      );
+                    }
 
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-
-                      if (snapshot.data!.docs.isEmpty) {
-                        return const Center(
-                          child: Text(
-                            "No products found",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        );
-                      }
-
-                      return ListView(
-                        children: snapshot.data!.docs
-                            .map((DocumentSnapshot document) {
-                          Map<String, dynamic> data =
-                          document.data() as Map<String, dynamic>;
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 5.0),
+                    return ListView(
+                      children:
+                          displayedProducts.map((DocumentSnapshot document) {
+                        Map<String, dynamic> data =
+                            document.data() as Map<String, dynamic>;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10.0, horizontal: 5.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              Get.to(() => ProductDetails(data));
+                            },
                             child: Card(
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15.0),
@@ -91,8 +131,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                 contentPadding: const EdgeInsets.all(15),
                                 leading: CircleAvatar(
                                   radius: 30,
-                                  backgroundImage: NetworkImage(
-                                      data['product-img'][0]),
+                                  backgroundImage:
+                                      NetworkImage(data['product-img'][0]),
                                 ),
                                 title: Text(
                                   data['product-name'],
@@ -111,11 +151,11 @@ class _SearchScreenState extends State<SearchScreen> {
                                 ),
                               ),
                             ),
-                          );
-                        }).toList(),
-                      );
-                    },
-                  ),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  },
                 ),
               ),
             ],

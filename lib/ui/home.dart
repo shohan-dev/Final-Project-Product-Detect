@@ -211,6 +211,7 @@ class _HomeState extends State<Home> {
                             style: const TextStyle(fontSize: 12),
                           ),
                         ),
+                        
                         Text(
                           "Price: ${_products[index]["product-price"].toString()} ৳",
                           style: const TextStyle(
