@@ -1,0 +1,53 @@
+import 'package:get/get.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+
+import 'package:ml_image/models/match/match_controller.dart';
+
+
+class TextExtractionController extends GetxController {
+  var extractedText = ''.obs;
+  var image = Rxn<File>(); // Observable for the image
+  final ImagePicker _picker = ImagePicker();
+  final MatchTextController matchTextController = Get.put(MatchTextController());
+
+  Future<void> pickImageGallery() async {
+    try {
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        image.value = File(pickedFile.path);
+        await extractText(image.value!);
+      }
+    } catch (e) {
+      print("Error picking image from gallery: $e");
+    }
+  }
+
+  Future<void> pickImageCamera() async {
+    try {
+      final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+      if (pickedFile != null) {
+        image.value = File(pickedFile.path);
+        await extractText(image.value!);
+      }
+    } catch (e) {
+      print("Error picking image from camera: $e");
+    }
+  }
+
+  Future<void> extractText(File imageFile) async {
+    final InputImage inputImage = InputImage.fromFile(imageFile);
+    final TextRecognizer textRecognizer = GoogleMlKit.vision.textRecognizer();
+    
+    try {
+      final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+      extractedText.value = recognizedText.text;
+      matchTextController.matchText(recognizedText.text); // Call matchText from MatchTextController
+    } catch (e) {
+      print("Error extracting text: $e");
+    } finally {
+      textRecognizer.close();
+    }
+  }
+}
