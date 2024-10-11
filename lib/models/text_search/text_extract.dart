@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ml_image/models/text_search/text_extract_controller.dart';
+import 'package:smart_shop/models/text_search/text_extract_controller.dart';
+
 
 class TextExtractionPage extends StatelessWidget {
   final TextExtractionController controller =

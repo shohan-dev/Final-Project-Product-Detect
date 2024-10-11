@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:ml_image/models/match/object_match_controller.dart';
-import 'package:ml_image/models/object_search/object_search_controller.dart';
+import 'package:smart_shop/models/match/object_match_controller.dart';
+import 'package:smart_shop/models/object_search/object_search_controller.dart';
 
 class ObjectSearch extends StatelessWidget {
   final ObjectSearchController controller = Get.put(ObjectSearchController());

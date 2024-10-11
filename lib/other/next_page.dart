@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ml_image/models/object_search/object_search.dart';
-import 'package:ml_image/models/text_search/text_extract.dart';
+import 'package:smart_shop/models/object_search/object_search.dart';
+import 'package:smart_shop/models/text_search/text_extract.dart';
+
 
 class NextPage extends StatelessWidget {
   const NextPage({super.key});

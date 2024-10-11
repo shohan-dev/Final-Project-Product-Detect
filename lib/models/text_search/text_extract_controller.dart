@@ -3,7 +3,8 @@ import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
-import 'package:ml_image/models/match/text_match_controller.dart';
+import 'package:smart_shop/models/match/text_match_controller.dart';
+
 
 
 class TextExtractionController extends GetxController {

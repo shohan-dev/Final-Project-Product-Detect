@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:ml_image/models/object_search/object_search_controller.dart';
+import 'package:smart_shop/models/object_search/object_search_controller.dart';
 
 class ObjectMatchController extends GetxController {
   static ObjectMatchController instance = Get.find(); // Singleton instance
