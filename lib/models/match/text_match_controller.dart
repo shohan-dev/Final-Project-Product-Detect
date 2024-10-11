@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-class MatchTextController extends GetxController {
+class TextMatchController extends GetxController {
   var matchedData = <String>[].obs; // Observable list for matched data
 
   // Define your list of data to match against in lowercase

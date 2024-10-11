@@ -3,14 +3,14 @@ import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
-import 'package:ml_image/models/match/match_controller.dart';
+import 'package:ml_image/models/match/text_match_controller.dart';
 
 
 class TextExtractionController extends GetxController {
   var extractedText = ''.obs;
   var image = Rxn<File>(); // Observable for the image
   final ImagePicker _picker = ImagePicker();
-  final MatchTextController matchTextController = Get.put(MatchTextController());
+  final TextMatchController matchTextController = Get.put(TextMatchController());
 
   Future<void> pickImageGallery() async {
     try {

@@ -3,19 +3,25 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:ml_image/models/match/object_match_controller.dart';
 import 'package:ml_image/models/object_search/object_search_controller.dart';
 
 class ObjectSearch extends StatelessWidget {
   final ObjectSearchController controller = Get.put(ObjectSearchController());
+  final matchtextcontroller = Get.put(ObjectMatchController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flutter TFlite'),
+        title: const Text('Flutter TFlite'),
       ),
       body: Center(
         child: Obx(() {
+          // Recalculate match text dynamically based on the current label
+          matchtextcontroller.matchText(controller.label.value);
+          var data = matchtextcontroller.matchedData;
+
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -27,25 +33,27 @@ class ObjectSearch extends StatelessWidget {
                   fit: BoxFit.cover,
                 )
               else
-                Text('No image selected'),
-              SizedBox(height: 20),
+                const Text('No image selected'),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
                     onPressed: () => controller.pickImage(ImageSource.camera),
-                    child: Text('Camera'),
+                    child: const Text('Camera'),
                   ),
-                  SizedBox(width: 20),
+                  const SizedBox(width: 20),
                   ElevatedButton(
                     onPressed: () => controller.pickImage(ImageSource.gallery),
-                    child: Text('Gallery'),
+                    child: const Text('Gallery'),
                   ),
                 ],
               ),
-              SizedBox(height: 20),
-              Text('Label: ${controller.label}'),
-              Text('Confidence: ${controller.confidence}'),
+              const SizedBox(height: 20),
+              Text('Label: ${controller.label.value}'), // Use .value
+              Text('Confidence: ${controller.confidence.value}'), // Use .value
+              const SizedBox(height: 20),
+              Text('Detected Objects: $data'), // Update dynamically
             ],
           );
         }),
