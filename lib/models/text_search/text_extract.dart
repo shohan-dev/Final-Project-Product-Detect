@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:smart_shop/models/text_search/text_extract_controller.dart';
 
 class TextExtractionPage extends StatelessWidget {
-  final TextExtractionController controller =
-      Get.put(TextExtractionController());
+  final TextExtractionController controller = Get.put(TextExtractionController());
 
   @override
   Widget build(BuildContext context) {
@@ -21,12 +21,12 @@ class TextExtractionPage extends StatelessWidget {
               children: [
                 const SizedBox(height: 200),
                 ElevatedButton(
-                  onPressed: controller.pickImageGallery,
+                  onPressed: () => controller.detectImage(ImageSource.gallery),
                   child: const Text('Gallery Image'),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: controller.pickImageCamera,
+                  onPressed: () => controller.detectImage(ImageSource.camera),
                   child: const Text('Camera Image'),
                 ),
                 const SizedBox(height: 20),

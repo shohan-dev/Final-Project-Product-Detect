@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:smart_shop/models/match/object_match_controller.dart';
+import 'package:smart_shop/ui/search_screen.dart';
 import 'package:tflite_v2/tflite_v2.dart';
 
 class ObjectSearchController extends GetxController {
@@ -37,21 +39,27 @@ class ObjectSearchController extends GetxController {
   }
 
   Future<void> detectImage(File image) async {
-    int startTime = DateTime.now().millisecondsSinceEpoch;
     recognitions.value = await Tflite.runModelOnImage(
-      path: image.path,
-      numResults: 6,
-      threshold: 0.05,
-      imageMean: 127.5,
-      imageStd: 127.5,
-    ) ?? [];
+          path: image.path,
+          numResults: 6,
+          threshold: 0.05,
+          imageMean: 127.5,
+          imageStd: 127.5,
+        ) ??
+        [];
 
     if (recognitions.isNotEmpty) {
       label.value = recognitions[0]['label'].toString();
       confidence.value = recognitions[0]['confidence'].toString();
     }
 
-    int endTime = DateTime.now().millisecondsSinceEpoch;
-    print("Inference took ${endTime - startTime}ms");
+    // Call matchText from ObjectMatchController
+    final controller = Get.put(ObjectMatchController());
+    controller.matchText(label.value);
+    final textdata = controller.matchedData;
+
+    Get.to(() => SearchScreen(
+          searchText: textdata.toString(),
+        ));
   }
 }

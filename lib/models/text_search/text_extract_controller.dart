@@ -13,9 +13,9 @@ class TextExtractionController extends GetxController {
   final TextMatchController matchTextController =
       Get.put(TextMatchController());
 
-  Future<void> pickImageGallery() async {
+  Future<void> detectImage(ImageSource img) async {
     try {
-      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      final pickedFile = await _picker.pickImage(source: img);
       if (pickedFile != null) {
         image.value = File(pickedFile.path);
         await extractText(image.value!);
@@ -30,25 +30,6 @@ class TextExtractionController extends GetxController {
       }
     } catch (e) {
       print("Error picking image from gallery: $e");
-    }
-  }
-
-  Future<void> pickImageCamera() async {
-    try {
-      final pickedFile = await _picker.pickImage(source: ImageSource.camera);
-      if (pickedFile != null) {
-        image.value = File(pickedFile.path);
-        await extractText(image.value!);
-        // Call matchText from MatchTextController
-        matchTextController.matchText(extractedText.value);
-        final textdata = matchTextController.matchedData;
-
-        Get.to(() => SearchScreen(
-              searchText: textdata.toString(),
-            ));
-      }
-    } catch (e) {
-      print("Error picking image from camera: $e");
     }
   }
 
