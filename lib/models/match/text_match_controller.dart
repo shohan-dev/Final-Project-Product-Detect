@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 class TextMatchController extends GetxController {
-  var matchedData = <String>[].obs; // Observable list for matched data
+  var matchedData = ''.obs; // Observable string for matched data
 
   // Define your list of data to match against in lowercase
   final List<String> dataToMatch = [
@@ -11,7 +11,7 @@ class TextMatchController extends GetxController {
     "keyword",
     "another",
     "book",
-    "mY",
+    "my", // corrected from "mY" to "my" for consistency
     "cover"
     // Add more items as needed
   ].map((item) => item.toLowerCase()).toList(); // Convert to lowercase
@@ -22,12 +22,11 @@ class TextMatchController extends GetxController {
     "publisher",
     "keyword",
     "cover"
-
     // Add more prioritized items as needed
   ].map((item) => item.toLowerCase()).toList();
 
   void matchText(String text) {
-    matchedData.clear(); // Clear previous matches
+    matchedData.value = ''; // Clear previous match
     List<String> words =
         text.toLowerCase().split(RegExp(r'\s+')); // Split text into words
 
@@ -52,7 +51,10 @@ class TextMatchController extends GetxController {
         return aIndex.compareTo(bIndex);
       });
 
-    matchedData
-        .addAll(sortedMatchedWords); // Add sorted words to the observable list
+    // Set matchedData to the highest priority match if available
+    if (sortedMatchedWords.isNotEmpty) {
+      matchedData.value =
+          sortedMatchedWords.first; // Store the highest priority match
+    }
   }
 }
