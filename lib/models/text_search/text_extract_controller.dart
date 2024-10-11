@@ -24,7 +24,7 @@ class TextExtractionController extends GetxController {
         matchTextController.matchText(extractedText.value);
         final textdata = matchTextController.matchedData;
 
-        Get.to(() => SearchScreen(
+        Get.off(() => SearchScreen(
               searchText: textdata.toString(),
             ));
       }

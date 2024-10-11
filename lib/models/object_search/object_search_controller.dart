@@ -58,7 +58,7 @@ class ObjectSearchController extends GetxController {
     controller.matchText(label.value);
     final textdata = controller.matchedData;
 
-    Get.to(() => SearchScreen(
+    Get.off(() => SearchScreen(
           searchText: textdata.toString(),
         ));
   }

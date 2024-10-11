@@ -5,7 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:smart_shop/other/next_page.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:smart_shop/models/other/next_page.dart';
 import '../../ui/AppColors.dart';
 import 'product_details_screen.dart';
 import 'search_screen.dart';
@@ -64,6 +65,9 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: Column(
         children: [
+          const SizedBox(
+            height: 10,
+          ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
             child: Row(
@@ -106,31 +110,19 @@ class _HomeState extends State<Home> {
                     onPressed: () {
                       Get.to(() => const NextPage());
                     },
-                    icon: const Icon(Icons.camera_alt_sharp,
-                        color: AppColors.deep_blue),
+                    icon: const Icon(Iconsax.scan, color: AppColors.deep_blue),
                     label: const Text(
-                      'Search by Image',
-                      style: TextStyle(fontSize: 12.0, color: Colors.grey),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[200],
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 20.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(40),
-                        side: const BorderSide(
-                          color: AppColors.deep_blue,
-                          width: 3.0,
-                        ),
-                      ),
+                      "Scan",
+                      style: TextStyle(color: AppColors.deep_blue),
                     ),
                   ),
                 ),
               ],
             ),
           ),
+          const SizedBox(height: 20),
           AspectRatio(
-            aspectRatio: 4.5,
+            aspectRatio: 2.5,
             child: CarouselSlider(
               items: _carouselImages
                   .map((item) => Padding(
@@ -139,7 +131,7 @@ class _HomeState extends State<Home> {
                           decoration: BoxDecoration(
                             image: DecorationImage(
                               image: NetworkImage(item),
-                              fit: BoxFit.fitWidth,
+                              fit: BoxFit.fill, // Change fit to cover
                             ),
                           ),
                         ),
@@ -171,12 +163,13 @@ class _HomeState extends State<Home> {
             ),
           ),
           SizedBox(height: 0.h),
+          // cardview for products
           Expanded(
             child: GridView.builder(
               scrollDirection: Axis.vertical,
               itemCount: _products.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
+                crossAxisCount: 2,
                 childAspectRatio: 0.7,
                 mainAxisSpacing: 8,
                 crossAxisSpacing: 8,
@@ -206,15 +199,20 @@ class _HomeState extends State<Home> {
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4.0),
-                          child: Text(
-                            "${_products[index]["product-name"]}",
-                            style: const TextStyle(fontSize: 12),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Text(
+                                "${_products[index]["product-name"]}",
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                            ),
                           ),
                         ),
                         Text(
                           "Price: ${_products[index]["product-price"].toString()} ৳",
                           style: const TextStyle(
-                              fontSize: 10, color: Colors.redAccent),
+                              fontSize: 15, color: Colors.redAccent),
                         ),
                       ],
                     ),

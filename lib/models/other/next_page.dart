@@ -18,14 +18,14 @@ class NextPage extends StatelessWidget {
             const SizedBox(height: 300),
             ElevatedButton(
               onPressed: () {
-                Get.to(() => TextExtractionPage());
+                Get.off(() => TextExtractionPage());
               },
               child: const Text('Text search'),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Get.to(() => ObjectSearch());
+                Get.off(() => ObjectSearch());
               },
               child: const Text('Object search'),
             ),
