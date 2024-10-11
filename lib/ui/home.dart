@@ -4,10 +4,11 @@ import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:smart_shop/other/next_page.dart';
 import '../../ui/AppColors.dart';
 import 'product_details_screen.dart';
 import 'search_screen.dart';
-import 'image_search.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -24,7 +25,7 @@ class _HomeState extends State<Home> {
 
   fetchCarouselImages() async {
     QuerySnapshot qn =
-    await _firestoreInstance.collection("carousel-slider").get();
+        await _firestoreInstance.collection("carousel-slider").get();
     setState(() {
       for (int i = 0; i < qn.docs.length; i++) {
         _carouselImages.add(
@@ -84,36 +85,37 @@ class _HomeState extends State<Home> {
                           borderSide: BorderSide(color: AppColors.deep_blue),
                         ),
                         hintText: "Search by Text",
-                        hintStyle: TextStyle(fontSize: 12.sp, color: Colors.grey),
-                        prefixIcon: const Icon(Icons.search, color: AppColors.deep_blue),
+                        hintStyle:
+                            TextStyle(fontSize: 12.sp, color: Colors.grey),
+                        prefixIcon: const Icon(Icons.search,
+                            color: AppColors.deep_blue),
                         contentPadding: EdgeInsets.symmetric(vertical: 10.h),
                       ),
                       onTap: () => Navigator.push(
                         context,
-                        CupertinoPageRoute(builder: (_) => const SearchScreen()),
+                        CupertinoPageRoute(
+                            builder: (_) => const SearchScreen()),
                       ),
                     ),
                   ),
                 ),
                 SizedBox(width: 10.w),
-
                 SizedBox(
                   height: 35.0, // Adjust to your needs
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const UploadImagePage()),
-                      );
+                      Get.to(() => const NextPage());
                     },
-                    icon: const Icon(Icons.camera_alt_sharp, color: AppColors.deep_blue),
+                    icon: const Icon(Icons.camera_alt_sharp,
+                        color: AppColors.deep_blue),
                     label: const Text(
                       'Search by Image',
                       style: TextStyle(fontSize: 12.0, color: Colors.grey),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey[200],
-                      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10.0, horizontal: 20.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(40),
                         side: const BorderSide(
@@ -127,22 +129,21 @@ class _HomeState extends State<Home> {
               ],
             ),
           ),
-
           AspectRatio(
             aspectRatio: 4.5,
             child: CarouselSlider(
               items: _carouselImages
                   .map((item) => Padding(
-                padding: const EdgeInsets.only(left: 10, right: 10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage(item),
-                      fit: BoxFit.fitWidth,
-                    ),
-                  ),
-                ),
-              ))
+                        padding: const EdgeInsets.only(left: 10, right: 10),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage(item),
+                              fit: BoxFit.fitWidth,
+                            ),
+                          ),
+                        ),
+                      ))
                   .toList(),
               options: CarouselOptions(
                 autoPlay: true,
@@ -170,8 +171,6 @@ class _HomeState extends State<Home> {
             ),
           ),
           SizedBox(height: 0.h),
-
-
           Expanded(
             child: GridView.builder(
               scrollDirection: Axis.vertical,
@@ -186,7 +185,8 @@ class _HomeState extends State<Home> {
                 return GestureDetector(
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => ProductDetails(_products[index])),
+                    MaterialPageRoute(
+                        builder: (_) => ProductDetails(_products[index])),
                   ),
                   child: Card(
                     elevation: 2,
@@ -213,7 +213,8 @@ class _HomeState extends State<Home> {
                         ),
                         Text(
                           "Price: ${_products[index]["product-price"].toString()} ৳",
-                          style: const TextStyle(fontSize: 10, color: Colors.redAccent),
+                          style: const TextStyle(
+                              fontSize: 10, color: Colors.redAccent),
                         ),
                       ],
                     ),
