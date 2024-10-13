@@ -5,8 +5,10 @@ import 'package:smart_shop/models/match/object_match_controller.dart';
 import 'package:smart_shop/models/object_search/object_search_controller.dart';
 
 class ObjectSearch extends StatelessWidget {
+  ObjectSearch({Key? key, required this.product}) : super(key: key);
   final ObjectSearchController controller = Get.put(ObjectSearchController());
   final matchtextcontroller = Get.put(ObjectMatchController());
+  final List<Map<String, dynamic>> product;
 
   @override
   Widget build(BuildContext context) {

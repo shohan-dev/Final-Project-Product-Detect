@@ -4,10 +4,17 @@ import 'package:image_picker/image_picker.dart';
 import 'package:smart_shop/models/text_search/text_extract_controller.dart';
 
 class TextExtractionPage extends StatelessWidget {
-  final TextExtractionController controller = Get.put(TextExtractionController());
+  // add constructor
+  TextExtractionPage({Key? key, required this.product}) : super(key: key);
+
+  final TextExtractionController controller =
+      Get.put(TextExtractionController());
+
+  final List<Map<String, dynamic>> product;
 
   @override
   Widget build(BuildContext context) {
+    print("All the product lsit==>>$product");
     return Scaffold(
       appBar: AppBar(
         title: const Text('Text Extraction from Image'),
