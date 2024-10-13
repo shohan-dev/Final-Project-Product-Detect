@@ -15,7 +15,10 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    Timer(const Duration(seconds: 2),()=>Navigator.push(context, CupertinoPageRoute(builder: (_)=>const BottomNavController())));
+    Timer(
+        const Duration(seconds: 2),
+        () => Navigator.push(context,
+            CupertinoPageRoute(builder: (_) => const BottomNavController())));
     super.initState();
   }
 
@@ -23,7 +26,6 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: SplashColors.splash_colors,
-
       body: SafeArea(
         child: Stack(
           children: [
@@ -32,17 +34,14 @@ class _SplashScreenState extends State<SplashScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-
                   Image.asset(
                     'assets/images/icon.png',
                     height: 150.h,
                     width: 150.w,
                   ),
-
                   SizedBox(
                     height: 10.h,
                   ),
-
                   Text(
                     "My Smart Shop",
                     style: TextStyle(
@@ -51,14 +50,12 @@ class _SplashScreenState extends State<SplashScreen> {
                       fontSize: 40.sp,
                     ),
                   ),
-
                   SizedBox(
                     height: 100.h,
                   ),
-
                   const CircularProgressIndicator(
                     color: Colors.white,
-                    backgroundColor: Color(0xFFF8934D),
+                    backgroundColor: AppColors.deep_blue,
                   ),
                 ],
               ),

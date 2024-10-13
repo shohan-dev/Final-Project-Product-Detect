@@ -47,7 +47,7 @@ Widget fetchData(String collectionName) {
                   backgroundImage: images != null && images is String
                       ? NetworkImage(images)
                       : const AssetImage('assets/images/placeholder.png')
-                  as ImageProvider,
+                          as ImageProvider,
                 ),
                 title: Text(
                   documentSnapshot['name'],

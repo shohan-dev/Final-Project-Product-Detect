@@ -17,8 +17,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(
-        'App started=============================================================');
     return ScreenUtilInit(
       designSize: const Size(375, 810),
       builder: (context, child) {

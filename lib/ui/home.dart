@@ -1,13 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
-import 'package:iconsax/iconsax.dart';
-import 'package:smart_shop/models/other/next_page.dart';
-import '../../ui/AppColors.dart';
+import 'package:smart_shop/ui/AppColors.dart';
 import 'product_details_screen.dart';
 import 'search_screen.dart';
 
@@ -69,7 +67,7 @@ class _HomeState extends State<Home> {
             height: 10,
           ),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 3.h),
             child: Row(
               children: [
                 Expanded(
@@ -80,21 +78,33 @@ class _HomeState extends State<Home> {
                       decoration: InputDecoration(
                         fillColor: Colors.grey[200],
                         filled: true,
+                        // Elevate design with a subtle shadow
                         focusedBorder: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(40)),
-                          borderSide: BorderSide(color: AppColors.deep_blue),
+                          borderRadius: BorderRadius.all(
+                              Radius.circular(50)), // More rounded
+                          borderSide: BorderSide(
+                              color: AppColors.deep_blue, width: 1.5),
                         ),
                         enabledBorder: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(40)),
-                          borderSide: BorderSide(color: AppColors.deep_blue),
+                          borderRadius: BorderRadius.all(
+                              Radius.circular(50)), // More rounded
+                          borderSide: BorderSide(
+                              color: AppColors.deep_blue, width: 1.5),
                         ),
                         hintText: "Search by Text",
-                        hintStyle:
-                            TextStyle(fontSize: 12.sp, color: Colors.grey),
+                        hintStyle: TextStyle(
+                          fontSize: 12.sp,
+                          color: Colors.grey[
+                              600], // Slightly darker grey for better visibility
+                        ),
+                        // Icon with a custom color and gradient for modern look
                         prefixIcon: const Icon(Icons.search,
                             color: AppColors.deep_blue),
-                        contentPadding: EdgeInsets.symmetric(vertical: 10.h),
+                        // Padding for improved spacing
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 12.h, horizontal: 15.w),
                       ),
+                      // On tap navigate to SearchScreen
                       onTap: () => Navigator.push(
                         context,
                         CupertinoPageRoute(
@@ -103,20 +113,21 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                 ),
-                SizedBox(width: 10.w),
-                SizedBox(
-                  height: 35.0, // Adjust to your needs
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Get.to(() => const NextPage());
-                    },
-                    icon: const Icon(Iconsax.scan, color: AppColors.deep_blue),
-                    label: const Text(
-                      "Scan",
-                      style: TextStyle(color: AppColors.deep_blue),
-                    ),
-                  ),
-                ),
+
+                // SizedBox(width: 10.w),
+                // SizedBox(
+                //   height: 35.0, // Adjust to your needs
+                //   child: ElevatedButton.icon(
+                //     onPressed: () {
+                //       Get.to(() => const NextPage());
+                //     },
+                //     icon: const Icon(Iconsax.scan, color: AppColors.deep_blue),
+                //     label: const Text(
+                //       "Scan",
+                //       style: TextStyle(color: AppColors.deep_blue),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -127,14 +138,7 @@ class _HomeState extends State<Home> {
               items: _carouselImages
                   .map((item) => Padding(
                         padding: const EdgeInsets.only(left: 10, right: 10),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: NetworkImage(item),
-                              fit: BoxFit.fill, // Change fit to cover
-                            ),
-                          ),
-                        ),
+                        child: CachedNetworkImage(imageUrl: item),
                       ))
                   .toList(),
               options: CarouselOptions(
@@ -187,15 +191,10 @@ class _HomeState extends State<Home> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        AspectRatio(
-                          aspectRatio: 1.0,
-                          child: Container(
-                            color: Colors.white,
-                            child: Image.network(
-                              _products[index]["product-img"][0],
+                        Expanded(
+                          child: CachedNetworkImage(
                               fit: BoxFit.cover,
-                            ),
-                          ),
+                              imageUrl: _products[index]["product-img"][0]),
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4.0),

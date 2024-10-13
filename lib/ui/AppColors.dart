@@ -2,10 +2,11 @@ import 'package:flutter/cupertino.dart';
 
 class AppColors {
   static const Color deep_blue = Color(0xFF615EFC);
+  static const Color splash_colors = Color(0xFF615EFC);
 }
 
 class SplashColors {
-  static const Color splash_colors = Color(0xFFFFE09B);
+  static const Color splash_colors = Color(0xFF615EFC);
 }
 
 class SecondaryColors {
