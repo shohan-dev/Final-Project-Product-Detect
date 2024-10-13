@@ -7,7 +7,7 @@ import 'package:smart_shop/models/match/text_match_controller.dart';
 import 'package:smart_shop/ui/search_screen.dart';
 
 class TextExtractionController extends GetxController {
-  var extractedText = ''.obs;
+  var extractedText = ''.obs; // Observable for extracted text
   var image = Rxn<File>(); // Observable for the image
   final ImagePicker _picker = ImagePicker();
   final TextMatchController matchTextController =
@@ -20,13 +20,24 @@ class TextExtractionController extends GetxController {
         image.value = File(pickedFile.path);
         await extractText(image.value!);
 
+        print("This is extract data======================== $extractedText.value");
+
         // Call matchText from MatchTextController
         matchTextController.matchText(extractedText.value);
         final textdata = matchTextController.matchedData;
 
-        Get.off(() => SearchScreen(
-              searchText: textdata.toString(),
-            ));
+        print("this is text data send $textdata");
+
+        // Ensure textdata is not null or empty
+        if (textdata != null && textdata.isNotEmpty) {
+          Get.off(() => SearchScreen(
+                searchText: textdata.toString(),
+              ));
+        } else {
+          print("No matched data found.");
+        }
+      } else {
+        print("No image selected.");
       }
     } catch (e) {
       print("Error picking image from gallery: $e");
@@ -41,8 +52,14 @@ class TextExtractionController extends GetxController {
       final RecognizedText recognizedText =
           await textRecognizer.processImage(inputImage);
       extractedText.value = recognizedText.text;
-      matchTextController.matchText(
-          recognizedText.text); // Call matchText from MatchTextController
+
+      // Ensure extracted text is not null or empty
+      if (extractedText.value.isNotEmpty) {
+        matchTextController.matchText(
+            recognizedText.text); // Call matchText from MatchTextController
+      } else {
+        print("Extracted text is empty.");
+      }
     } catch (e) {
       print("Error extracting text: $e");
     } finally {
