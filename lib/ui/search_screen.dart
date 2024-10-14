@@ -59,16 +59,24 @@ class _SearchScreenState extends State<SearchScreen> {
 
   List<QueryDocumentSnapshot> _searchProducts(String query) {
     if (query.isEmpty) {
-      return allProducts.take(10).toList();
+      return allProducts
+          .take(10)
+          .toList(); // Return the first 10 products if no query
     }
 
     return allProducts.where((document) {
       Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+
+      // Convert fields to lowercase to ensure case-insensitive search
       String productName =
           (data['product-name'] as String?)?.toLowerCase() ?? '';
       String product = (data['product'] as String?)?.toLowerCase() ?? '';
+      String label = (data['label'] as String?)?.toLowerCase() ?? '';
+
+      // Check if any of the fields contain the query
       return productName.contains(query.toLowerCase()) ||
-          product.contains(query.toLowerCase());
+          product.contains(query.toLowerCase()) ||
+          label.contains(query.toLowerCase());
     }).toList();
   }
 
@@ -83,8 +91,6 @@ class _SearchScreenState extends State<SearchScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Search your product"),
-        // automaticallyImplyLeading: false,
-
         backgroundColor: SecondaryColors.secondary_colors,
       ),
       body: SafeArea(

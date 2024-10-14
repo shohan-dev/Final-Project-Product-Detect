@@ -20,16 +20,17 @@ class TextExtractionController extends GetxController {
         image.value = File(pickedFile.path);
         await extractText(image.value!);
 
-        print("This is extract data======================== $extractedText.value");
+        print(
+            "This is extract data======================== $extractedText.value");
 
         // Call matchText from MatchTextController
-        matchTextController.matchText(extractedText.value);
+        matchTextController.matchTextList(extractedText.value.split('\n'));
         final textdata = matchTextController.matchedData;
 
         print("this is text data send $textdata");
 
         // Ensure textdata is not null or empty
-        if (textdata != null && textdata.isNotEmpty) {
+        if (textdata.isNotEmpty) {
           Get.off(() => SearchScreen(
                 searchText: textdata.toString(),
               ));
@@ -55,8 +56,8 @@ class TextExtractionController extends GetxController {
 
       // Ensure extracted text is not null or empty
       if (extractedText.value.isNotEmpty) {
-        matchTextController.matchText(
-            recognizedText.text); // Call matchText from MatchTextController
+        matchTextController.matchTextList(recognizedText.text
+            .split('\n')); // Call matchText from MatchTextController
       } else {
         print("Extracted text is empty.");
       }

@@ -21,7 +21,7 @@ class ObjectSearchController extends GetxController {
 
   loadModel() async {
     await Tflite.loadModel(
-      model: "assets/mobilenet_v1_1.0_224.tflite",
+      model: "assets/model.tflite",
       labels: "assets/labels.txt",
     );
   }
@@ -57,6 +57,9 @@ class ObjectSearchController extends GetxController {
     final controller = Get.put(ObjectMatchController());
     controller.matchText(label.value);
     final textdata = controller.matchedData;
+
+    print('Label: ${label.value}');
+    print('Confidence: ${confidence.value}');
 
     Get.off(() => SearchScreen(
           searchText: textdata.toString(),

@@ -10,7 +10,6 @@ class TextMatchController extends GetxController {
 
   // Function to update product lists
   void updateProductLists() {
-    // Initialize ProductController only once
     final productController = Get.find<ProductController>();
 
     labelNameList.clear();
@@ -35,72 +34,66 @@ class TextMatchController extends GetxController {
     print('Product Class List: $productClassList');
   }
 
-  void matchText(String text) {
-    matchedData.value = ''; // Clear previous match
-    String lowerCaseText = text.toLowerCase().trim(); // Trim and lowercase the input text
+  // Function to match a list of texts against product data
+  void matchTextList(List<String> textList) {
+    matchedData.value = ''; // Clear previous matches
 
-    // If the extracted text is empty, show a snackbar using GetX
-    if (lowerCaseText.isEmpty) {
-      _showSnackBar('No text found. Please take another photo or select an image.');
+    if (textList.isEmpty) {
+      _showSnackBar('No texts found. Please take another photo or select an image.');
       return;
     }
 
-    print('Matching text: $lowerCaseText');
+    // Lowercase all input texts
+    List<String> lowerCaseTexts = textList.map((text) => text.toLowerCase().trim()).toList();
+
+    print('Matching texts: $lowerCaseTexts');
 
     updateProductLists(); // Update product lists
 
-    // Check for closest substring match in labelNameList
-    String? bestMatch;
-    int bestMatchLength = 0;
-
-    for (String label in labelNameList) {
-      if (label.contains(lowerCaseText)) {
-        matchedData.value = label; // Exact or substring match
-        print('Matched full/substring label: $label');
-        _showSnackBar('Match found: $label');
-        return;
+    // Iterate over each input text and attempt to find a match
+    for (String lowerCaseText in lowerCaseTexts) {
+      // Check for empty text
+      if (lowerCaseText.isEmpty) {
+        _showSnackBar('Empty text found. Please check the input or take another photo.');
+        continue; // Skip empty texts
       }
 
-      // Check for partial word matches or best phrase match
-      int matchLength = _findBestPartialMatch(lowerCaseText, label);
-      if (matchLength > bestMatchLength) {
-        bestMatch = label;
-        bestMatchLength = matchLength;
+      // Try to match the current text against the product data
+      if (_matchSingleText(lowerCaseText)) {
+        return; // Exit if a match is found
       }
     }
 
-    // If a best partial match was found
-    if (bestMatch != null) {
-      matchedData.value = bestMatch;
-      print('Best partial match: $bestMatch');
-      _showSnackBar('Best partial match: $bestMatch');
-      return;
+    // If no matches were found for any text in the list
+    print('No matches found for any of the texts.');
+    _showSnackBar('No match found for any of the texts. Please take another photo.');
+  }
+
+  // Helper function to match a single text against product data
+  bool _matchSingleText(String text) {
+    // Check for exact or substring match in labelNameList
+    for (String label in labelNameList) {
+      if (label.contains(text)) {
+        matchedData.value = label; // Exact or substring match
+        print('Matched label: $label');
+        _showSnackBar('Match found: $label');
+        return true; // Exit if a match is found
+      }
     }
 
     // Check for word-by-word matches in productNameList and productClassList
-    bool productNameMatch = _matchInList(lowerCaseText, productNameList, 'productNameList');
+    bool productNameMatch = _matchInList(text, productNameList, 'Product Name List');
     if (!productNameMatch) {
-      bool productClassMatch = _matchInList(lowerCaseText, productClassList, 'productClassList');
-      if (!productClassMatch) {
-        // If no matches found
-        print('No matches found.');
-        _showSnackBar('No match found. Please take another photo.');
+      bool productClassMatch = _matchInList(text, productClassList, 'Product Class List');
+      if (productClassMatch) {
+        return true;
       }
+    } else {
+      return true;
     }
-  }
 
-  // Helper to find the length of best partial match
-  int _findBestPartialMatch(String input, String target) {
-    List<String> inputWords = input.split(RegExp(r'\s+'));
-    List<String> targetWords = target.split(RegExp(r'\s+'));
-
-    int matchLength = 0;
-    for (String word in inputWords) {
-      if (targetWords.contains(word)) {
-        matchLength += word.length;
-      }
-    }
-    return matchLength;
+    // No match for the current text
+    return false;
   }
 
   // Helper to match individual words in a list
