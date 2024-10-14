@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:smart_shop/common/loaders.dart';
 import 'package:smart_shop/models/match/object_match_controller.dart';
 import 'package:smart_shop/ui/search_screen.dart';
 import 'package:tflite_v2/tflite_v2.dart';
@@ -61,8 +62,14 @@ class ObjectSearchController extends GetxController {
     print('Label: ${label.value}');
     print('Confidence: ${confidence.value}');
 
-    Get.off(() => SearchScreen(
-          searchText: textdata.toString(),
-        ));
+    // if Confidence == 1 then set the textdata or else set "" data
+    if (confidence.value == '1.0') {
+      Get.off(() => SearchScreen(
+            searchText: textdata.toString(),
+          ));
+    } else {
+      TLoaders.warningSnackBar(title: "No Match Found", message: "Try Again");
+      return;
+    }
   }
 }

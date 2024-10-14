@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:smart_shop/common/loaders.dart';
 import 'dart:io';
 
 import 'package:smart_shop/models/match/text_match_controller.dart';
@@ -35,7 +36,8 @@ class TextExtractionController extends GetxController {
                 searchText: textdata.toString(),
               ));
         } else {
-          print("No matched data found.");
+          TLoaders.warningSnackBar(
+              title: 'No match found', message: 'Try again');
         }
       } else {
         print("No image selected.");

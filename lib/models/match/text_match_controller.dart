@@ -38,10 +38,7 @@ class TextMatchController extends GetxController {
   void matchTextList(List<String> textList) {
     matchedData.value = ''; // Clear previous matches
 
-    if (textList.isEmpty) {
-      _showSnackBar('No texts found. Please take another photo or select an image.');
-      return;
-    }
+
 
     // Lowercase all input texts
     List<String> lowerCaseTexts = textList.map((text) => text.toLowerCase().trim()).toList();
@@ -53,10 +50,7 @@ class TextMatchController extends GetxController {
     // Iterate over each input text and attempt to find a match
     for (String lowerCaseText in lowerCaseTexts) {
       // Check for empty text
-      if (lowerCaseText.isEmpty) {
-        _showSnackBar('Empty text found. Please check the input or take another photo.');
-        continue; // Skip empty texts
-      }
+
 
       // Try to match the current text against the product data
       if (_matchSingleText(lowerCaseText)) {
@@ -66,7 +60,7 @@ class TextMatchController extends GetxController {
 
     // If no matches were found for any text in the list
     print('No matches found for any of the texts.');
-    _showSnackBar('No match found for any of the texts. Please take another photo.');
+
   }
 
   // Helper function to match a single text against product data
@@ -76,7 +70,7 @@ class TextMatchController extends GetxController {
       if (label.contains(text)) {
         matchedData.value = label; // Exact or substring match
         print('Matched label: $label');
-        _showSnackBar('Match found: $label');
+
         return true; // Exit if a match is found
       }
     }
@@ -104,20 +98,11 @@ class TextMatchController extends GetxController {
       if (list.contains(word)) {
         matchedData.value = word; // Store the match
         print('Matched in $listName: $word');
-        _showSnackBar('Match found in $listName: $word');
         return true; // Exit if a match is found
       }
     }
     return false; // No match found in this list
   }
 
-  // Snackbar function using GetX to display messages to the user
-  void _showSnackBar(String message) {
-    Get.snackbar(
-      'Info', // Title of the snackbar
-      message,
-      snackPosition: SnackPosition.BOTTOM,
-      duration: Duration(seconds: 2),
-    );
-  }
+
 }
