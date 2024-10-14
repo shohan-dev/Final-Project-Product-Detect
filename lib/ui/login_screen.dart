@@ -19,18 +19,18 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscureText = true;
 
-
   signIn() async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
-          email: _emailController.text, password: _passwordController.text);
+              email: _emailController.text, password: _passwordController.text);
 
       var authCredential = userCredential.user;
 
       if (authCredential != null && authCredential.uid.isNotEmpty) {
         Fluttertoast.showToast(msg: "Login Successfully");
         Future.delayed(const Duration(milliseconds: 500), () {
+          print("Login Successfully");
           Navigator.push(context,
               CupertinoPageRoute(builder: (_) => const BottomNavController()));
         });
@@ -45,9 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-
-
-  Widget customButton (String buttonText,onPressed){
+  Widget customButton(String buttonText, onPressed) {
     return SizedBox(
       width: 1.sw,
       height: 56.h,
@@ -59,13 +57,11 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         child: Text(
           buttonText,
-          style: TextStyle(
-              color: Colors.white, fontSize: 18.sp),
+          style: TextStyle(color: Colors.white, fontSize: 18.sp),
         ),
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +87,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-
             Expanded(
               child: Container(
                 width: ScreenUtil().screenWidth,
@@ -112,7 +107,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         Text(
                           "Login",
                           style: TextStyle(
-                              fontSize: 24.sp, color: AppColors.deep_blue, fontWeight: FontWeight.bold),
+                              fontSize: 24.sp,
+                              color: AppColors.deep_blue,
+                              fontWeight: FontWeight.bold),
                         ),
 
                         SizedBox(
@@ -138,7 +135,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             SizedBox(
                               width: 10.w,
                             ),
-
                             Expanded(
                               child: TextField(
                                 controller: _emailController,
@@ -228,9 +224,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: 50.h,
                         ),
                         // elevated button
-                        customButton("Log In", (){
-                          signIn();
-                        },),
+                        customButton(
+                          "Log In",
+                          () {
+                            signIn();
+                          },
+                        ),
                         SizedBox(
                           height: 20.h,
                         ),

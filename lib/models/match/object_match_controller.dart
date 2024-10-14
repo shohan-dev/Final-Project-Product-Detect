@@ -7,6 +7,7 @@ class ObjectMatchController extends GetxController {
 
   // Access a single label string from ObjectSearchController
   final RxString labelData = ObjectSearchController.instance.label;
+  final RxString confidencedata = ObjectSearchController.instance.confidence;
 
   // Define your list of data to match against in lowercase
   final List<String> dataToMatch = [
@@ -63,6 +64,9 @@ class ObjectMatchController extends GetxController {
         matches.add(word); // Add matched word to the set
       }
     }
+
+    print("labelData:=================> ${labelData.value}");
+    print("confidencedata:============> ${confidencedata.value}");
 
     // Join the matched words into a single string
     matchedData.value =
