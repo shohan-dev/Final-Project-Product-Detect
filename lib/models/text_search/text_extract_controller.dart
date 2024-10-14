@@ -22,7 +22,7 @@ class TextExtractionController extends GetxController {
         await extractText(image.value!);
 
         print(
-            "This is extract data======================== $extractedText.value");
+            "This is extract data======================== ${extractedText.value}");
 
         // Call matchText from MatchTextController
         matchTextController.matchTextList(extractedText.value.split('\n'));
