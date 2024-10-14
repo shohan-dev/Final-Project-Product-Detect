@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:smart_shop/ui/AppColors.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:smart_shop/ui/login_screen.dart'; // Import the fluttertoast package
+// Import the fluttertoast package
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -107,9 +106,9 @@ class _ProfileState extends State<Profile> {
           height: 50,
           child: ElevatedButton(
             onPressed: () {
-              print("Logout");
-              FirebaseAuth.instance.signOut();
-              Get.offAll(() => const LoginScreen());
+              // print("Logout");
+              // FirebaseAuth.instance.signOut();
+              // Get.offAll(() => const LoginScreen());
             },
             style: ElevatedButton.styleFrom(
               shape: RoundedRectangleBorder(

@@ -10,5 +10,6 @@ class SplashColors {
 }
 
 class SecondaryColors {
-  static const Color secondary_colors = Color(0xFFFFF4DD);
+  // static const Color secondary_colors = Color(0xFFFFF4DD);
+  static const Color secondary_colors = Color(0xFF615EFC);
 }

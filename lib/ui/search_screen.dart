@@ -90,8 +90,10 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Search your product"),
-        backgroundColor: SecondaryColors.secondary_colors,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text("Search your product",
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        backgroundColor: AppColors.deep_blue,
       ),
       body: SafeArea(
         child: Padding(

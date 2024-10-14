@@ -16,8 +16,10 @@ class NextPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+          iconTheme: const IconThemeData(color: Colors.white),
           title: const Text('Smart Shop',
-              style: TextStyle(fontWeight: FontWeight.bold)),
+              style:
+                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
           backgroundColor:
               AppColors.splash_colors // Updated color for better contrast
           ),
