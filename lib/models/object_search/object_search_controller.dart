@@ -146,17 +146,15 @@ class ObjectSearchController extends GetxController {
     // Log matched data for debugging
     print("Matched data found: ${matchedData.value}");
     TFullScreenLoader.stopLoading(); // Stop loading dialog
-    Get.off(() => SearchScreen(
-        searchText: matchedData.value)); // Navigate to SearchScreen
 
-    // // Navigate to SearchScreen after a successful match
-    // if (matchedData.value.isNotEmpty) {
-    //   Get.off(() => SearchScreen(
-    //       searchText: matchedData.value)); // Navigate to SearchScreen
-    // } else {
-    //   TLoaders.warningSnackBar(
-    //       title: "No Matches", message: "No matching items found.");
-    // }
+    // Navigate to SearchScreen after a successful match
+    if (matchedData.value.isNotEmpty) {
+      Get.off(() => SearchScreen(
+          searchText: matchedData.value)); // Navigate to SearchScreen
+    } else {
+      TLoaders.warningSnackBar(
+          title: "No Product Found", message: "Please try again.");
+    }
   }
 
   void matchText(String text, List<String> dataToMatch) {
