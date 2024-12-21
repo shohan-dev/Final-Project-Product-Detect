@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:smart_shop/models/object_search/object_search_controller.dart';
 import 'package:smart_shop/models/other/next_page_controller.dart';
+import 'package:smart_shop/models/similar/similar.dart';
 import 'package:smart_shop/models/text_search/text_extract_controller.dart';
 import 'package:smart_shop/ui/AppColors.dart';
 
@@ -46,6 +47,30 @@ class NextPage extends StatelessWidget {
                       'Object Search',
                       _showImageSourceBottomSheetObject,
                       AppColors.splash_colors),
+
+                  // Similar search button
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Get.to(() => SimilarScreen());
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.splash_colors,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 120, vertical: 15),
+                      elevation: 5,
+                    ),
+                    child: const Text(
+                      'Similar Search',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                    ),
+                  )
                 ],
               ),
             ),
