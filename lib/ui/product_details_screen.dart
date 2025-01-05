@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';  // Import Fluttertoast
+import 'package:fluttertoast/fluttertoast.dart'; // Import Fluttertoast
 import 'package:smart_shop/ui/AppColors.dart';
 
 class ProductDetails extends StatefulWidget {
@@ -20,13 +20,9 @@ class _ProductDetailsState extends State<ProductDetails> {
     final FirebaseAuth auth = FirebaseAuth.instance;
     var currentUser = auth.currentUser;
     CollectionReference collectionRef =
-    FirebaseFirestore.instance.collection("users-cart-items");
+        FirebaseFirestore.instance.collection("users-cart-items");
 
-    return collectionRef
-        .doc(currentUser!.email)
-        .collection("items")
-        .doc()
-        .set({
+    return collectionRef.doc(currentUser!.email).collection("items").doc().set({
       "name": widget.product["product-name"],
       "price": widget.product["product-price"],
       "images": widget.product["product-img"],
@@ -37,13 +33,9 @@ class _ProductDetailsState extends State<ProductDetails> {
     final FirebaseAuth auth = FirebaseAuth.instance;
     var currentUser = auth.currentUser;
     CollectionReference collectionRef =
-    FirebaseFirestore.instance.collection("users-favourite-items");
+        FirebaseFirestore.instance.collection("users-favourite-items");
 
-    return collectionRef
-        .doc(currentUser!.email)
-        .collection("items")
-        .doc()
-        .set({
+    return collectionRef.doc(currentUser!.email).collection("items").doc().set({
       "name": widget.product["product-name"],
       "price": widget.product["product-price"],
       "images": widget.product["product-img"],
@@ -85,9 +77,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                       onPressed: () => snapshot.data!.docs.isEmpty
                           ? addToFavourite()
                           : Fluttertoast.showToast(
-                          msg: "Already Added"), // Show toast message if already added
+                              msg:
+                                  "Already Added"), // Show toast message if already added
                       icon: snapshot.data!.docs.isEmpty
-                          ? const Icon(Icons.favorite_outline, color: Colors.white)
+                          ? const Icon(Icons.favorite_outline,
+                              color: Colors.white)
                           : const Icon(Icons.favorite, color: Colors.white),
                     ),
                   ),
@@ -110,16 +104,16 @@ class _ProductDetailsState extends State<ProductDetails> {
                 child: CarouselSlider(
                   items: widget.product['product-img']
                       .map<Widget>((item) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(item),
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                  ))
+                            padding: const EdgeInsets.symmetric(horizontal: 0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: NetworkImage(item),
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
+                          ))
                       .toList(),
                   options: CarouselOptions(
                     autoPlay: false,
@@ -136,7 +130,7 @@ class _ProductDetailsState extends State<ProductDetails> {
               Text(
                 widget.product['product-name'],
                 style:
-                const TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
               ),
               Text(widget.product['product-description']),
               const SizedBox(height: 20),

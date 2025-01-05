@@ -41,12 +41,12 @@ class NextPage extends StatelessWidget {
                   const SizedBox(height: 100), // Reduced unnecessary height
                   _buildSearchButton(context, 'Text Search',
                       _showImageSourceBottomSheet, AppColors.splash_colors),
-                  const SizedBox(height: 20),
-                  _buildSearchButton(
-                      context,
-                      'Object Search',
-                      _showImageSourceBottomSheetObject,
-                      AppColors.splash_colors),
+                  // const SizedBox(height: 20),
+                  // _buildSearchButton(
+                  //     context,
+                  //     'Object Search',
+                  //     _showImageSourceBottomSheetObject,
+                  //     AppColors.splash_colors),
 
                   // Similar search button
                   const SizedBox(height: 20),

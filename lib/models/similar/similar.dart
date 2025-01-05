@@ -1,10 +1,14 @@
 import 'dart:convert'; // For JSON decoding
-import 'dart:typed_data';
+import 'dart:typed_data'; // For handling image bytes
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:smart_shop/models/similar/widgets/product_grid_view.dart';
+import 'package:smart_shop/models/similar/widgets/selected_image_widget.dart';
+import 'package:smart_shop/models/similar/widgets/send_image_button.dart';
+import 'package:smart_shop/ui/product_details_screen.dart';
 
 class SimilarScreen extends StatefulWidget {
   @override
@@ -15,7 +19,9 @@ class _SimilarScreenState extends State<SimilarScreen> {
   Uint8List? selectedImageBytes;
   String? selectedImageName;
   List<Map<String, dynamic>>? products;
-  bool isLoading = false; // To manage loading state
+  bool isLoading =
+      false; // Indicates if the request for similar products is in progress
+  bool isImageLoading = false; // Indicates if image upload is in progress
 
   /// Pick an image from the gallery
   Future<void> _pickImage() async {
@@ -44,7 +50,7 @@ class _SimilarScreenState extends State<SimilarScreen> {
     }
 
     setState(() {
-      isLoading = true; // Show loading indicator when sending image
+      isImageLoading = true; // Show loading indicator while sending image
     });
 
     try {
@@ -55,18 +61,20 @@ class _SimilarScreenState extends State<SimilarScreen> {
           .get();
 
       final data = doc.data() as Map<String, dynamic>?;
+
       if (data != null && data.containsKey('Server')) {
         final serverUrl = data['Server'];
 
         // Create a multipart request
         final request = http.MultipartRequest(
             'POST', Uri.parse('$serverUrl/similar_image'));
+
         request.files.add(
           http.MultipartFile.fromBytes(
             'file', // Key for the file
-            selectedImageBytes!,
+            selectedImageBytes!, // Image bytes
             filename: selectedImageName,
-            contentType: MediaType('image', 'jpeg'), // all image type
+            contentType: MediaType('image', 'jpeg'), // JPEG image
           ),
         );
 
@@ -92,11 +100,19 @@ class _SimilarScreenState extends State<SimilarScreen> {
       }
     } catch (e) {
       print('Error sending image: $e');
+    } finally {
+      setState(() {
+        isImageLoading = false; // Hide loading after processing
+      });
     }
   }
 
-  /// Fetch product details from Firestore
+  /// Fetch product details from Firestore based on similar image IDs
   Future<void> _fetchProductDetails(List<String> similarImageIds) async {
+    setState(() {
+      isLoading = true; // Show loading indicator while fetching products
+    });
+
     try {
       List<Map<String, dynamic>> fetchedProducts = [];
 
@@ -112,7 +128,9 @@ class _SimilarScreenState extends State<SimilarScreen> {
       }
 
       setState(() {
-        products = fetchedProducts;
+        products = fetchedProducts.isEmpty
+            ? null
+            : fetchedProducts; // Handle empty products
         isLoading = false; // Hide loading after data is fetched
       });
     } catch (e) {
@@ -129,154 +147,50 @@ class _SimilarScreenState extends State<SimilarScreen> {
       appBar: AppBar(
         title: Text('Find Similar Products',
             style: TextStyle(color: Colors.white)),
-        backgroundColor: Color(0xFF615EFC), // Primary color
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            selectedImageBytes != null
-                ? Image.memory(selectedImageBytes!, height: 200)
-                : ElevatedButton(
-                    onPressed: _pickImage,
-                    child: Text('Pick Image',
-                        style: TextStyle(fontSize: 16, color: Colors.white)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF615EFC), // Primary color
-                    ),
-                  ),
-            SizedBox(height: 20),
-            if (selectedImageBytes != null)
-              ElevatedButton(
-                onPressed: _sendImage,
-                child: Text('Send Image',
-                    style: TextStyle(fontSize: 16, color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF615EFC), // Primary color
-                ),
-              ),
-            SizedBox(height: 20),
-            if (isLoading)
-              Center(child: CircularProgressIndicator(color: Color(0xFF615EFC)))
-            else
-              Expanded(
-                child: products != null
-                    ? GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                        ),
-                        itemCount: products!.length,
-                        itemBuilder: (context, index) {
-                          final product = products![index];
-                          return GestureDetector(
-                            onTap: () {
-                              // Navigate to the product details page
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ProductDetailsScreen(
-                                    product: product,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Card(
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Expanded(
-                                    child: product['product-img'][0] != null
-                                        ? Image.network(
-                                            product['product-img'][0],
-                                            fit: BoxFit.cover,
-                                          )
-                                        : Icon(Icons.image, size: 50),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        Text(
-                                          product['product-name'] ??
-                                              'Product Name',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        Text(
-                                          product['product-price'] != null
-                                              ? '\$${product['product-price']}'
-                                              : 'Price Unavailable',
-                                          style: TextStyle(color: Colors.green),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      )
-                    : Center(child: Text('No products found')),
-              ),
-          ],
+        backgroundColor: Color(0xFF615EFC),
+        // backbutton white color
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
-    );
-  }
-}
-
-class ProductDetailsScreen extends StatelessWidget {
-  final Map<String, dynamic> product;
-
-  ProductDetailsScreen({required this.product});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(product['product-name'] ?? 'Product Details',
-            style: TextStyle(color: Colors.white)),
-        backgroundColor: Color(0xFF615EFC), // Primary color
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Image.network(
-              product['product-img'][0] ?? '',
-              fit: BoxFit.cover,
-              height: 200,
+            SelectedImageWidget(
+              selectedImageBytes: selectedImageBytes,
+              onPickImage: _pickImage,
             ),
             SizedBox(height: 20),
-            Text(
-              product['product-name'] ?? 'Product Name',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-            ),
-            SizedBox(height: 10),
-            Text(
-              product['product-price'] != null
-                  ? '\$${product['product-price']}'
-                  : 'Price Unavailable',
-              style: TextStyle(color: Colors.green, fontSize: 20),
+            SendImageButton(
+              onSendImage: _sendImage,
+              selectedImageBytes: selectedImageBytes,
             ),
             SizedBox(height: 20),
-            Text(
-              product['product-description'] ?? 'No description available.',
-              style: TextStyle(fontSize: 16),
-            ),
+            if (isImageLoading)
+              Center(child: CircularProgressIndicator(color: Color(0xFF615EFC)))
+            else if (isLoading)
+              Center(child: CircularProgressIndicator(color: Color(0xFF615EFC)))
+            else if (products == null || products!.isEmpty)
+              Center(
+                  child:
+                      Text('No products found', style: TextStyle(fontSize: 18)))
+            else
+              ProductGridView(
+                products: products!,
+                onProductTap: (product) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProductDetails(product),
+                    ),
+                  );
+                },
+              ),
           ],
         ),
       ),
