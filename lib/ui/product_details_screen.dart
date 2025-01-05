@@ -4,7 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart'; // Import Fluttertoast
+import 'package:get/get.dart';
 import 'package:smart_shop/ui/AppColors.dart';
+import 'package:smart_shop/ui/cart.dart';
 
 class ProductDetails extends StatefulWidget {
   final Map<String, dynamic> product;
@@ -16,13 +18,14 @@ class ProductDetails extends StatefulWidget {
 }
 
 class _ProductDetailsState extends State<ProductDetails> {
+  // Function to add product to the cart
   Future<void> addToCart() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     var currentUser = auth.currentUser;
     CollectionReference collectionRef =
         FirebaseFirestore.instance.collection("users-cart-items");
 
-    return collectionRef.doc(currentUser!.email).collection("items").doc().set({
+    await collectionRef.doc(currentUser!.email).collection("items").doc().set({
       "name": widget.product["product-name"],
       "price": widget.product["product-price"],
       "images": widget.product["product-img"],
@@ -30,6 +33,7 @@ class _ProductDetailsState extends State<ProductDetails> {
     }).then((value) => Fluttertoast.showToast(msg: "Added to cart"));
   }
 
+  // Function to add product to the favourite
   Future<void> addToFavourite() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     var currentUser = auth.currentUser;
@@ -42,6 +46,25 @@ class _ProductDetailsState extends State<ProductDetails> {
       "images": widget.product["product-img"],
       "decresption": widget.product["product-description"],
     }).then((value) => Fluttertoast.showToast(msg: "Added to favourite"));
+  }
+
+  // Function to remove product from the favourite
+  Future<void> removeFromFavourite() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    var currentUser = auth.currentUser;
+    CollectionReference collectionRef =
+        FirebaseFirestore.instance.collection("users-favourite-items");
+
+    return collectionRef
+        .doc(currentUser!.email)
+        .collection("items")
+        .where("name", isEqualTo: widget.product["product-name"])
+        .get()
+        .then((value) {
+      for (var element in value.docs) {
+        element.reference.delete();
+      }
+    }).then((value) => Fluttertoast.showToast(msg: "Removed from favourite"));
   }
 
   @override
@@ -78,9 +101,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                     child: IconButton(
                       onPressed: () => snapshot.data!.docs.isEmpty
                           ? addToFavourite()
-                          : Fluttertoast.showToast(
-                              msg:
-                                  "Already Added"), // Show toast message if already added
+                          : removeFromFavourite(),
                       icon: snapshot.data!.docs.isEmpty
                           ? const Icon(Icons.favorite_outline,
                               color: Colors.white)
@@ -144,20 +165,59 @@ class _ProductDetailsState extends State<ProductDetails> {
                     color: Colors.red),
               ),
               const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                height: 50.h,
-                child: ElevatedButton(
-                  onPressed: () => addToCart(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.deep_blue,
-                    elevation: 3,
-                  ),
-                  child: Text(
-                    "Add to Cart",
-                    style: TextStyle(color: Colors.white, fontSize: 18.sp),
-                  ),
-                ),
+              // Use StreamBuilder to listen for cart updates in real-time
+              StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection("users-cart-items")
+                    .doc(FirebaseAuth.instance.currentUser!.email)
+                    .collection("items")
+                    .where("name", isEqualTo: widget.product['product-name'])
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  // If the product is already in the cart, show "Go to Cart"
+                  if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                    return SizedBox(
+                      width: double.infinity,
+                      height: 50.h,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Get.to(() => const Cart());
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.deep_blue,
+                          elevation: 3,
+                        ),
+                        child: Text(
+                          "Go to Cart",
+                          style:
+                              TextStyle(color: Colors.white, fontSize: 18.sp),
+                        ),
+                      ),
+                    );
+                  } else {
+                    // If the product is not in the cart, show "Add to Cart"
+                    return SizedBox(
+                      width: double.infinity,
+                      height: 50.h,
+                      child: ElevatedButton(
+                        onPressed: () => addToCart(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.deep_blue,
+                          elevation: 3,
+                        ),
+                        child: Text(
+                          "Add to Cart",
+                          style:
+                              TextStyle(color: Colors.white, fontSize: 18.sp),
+                        ),
+                      ),
+                    );
+                  }
+                },
               ),
             ],
           ),
