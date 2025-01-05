@@ -14,10 +14,10 @@ class ProductDetails extends StatefulWidget {
   const ProductDetails(this.product, {super.key});
 
   @override
-  _ProductDetailsState createState() => _ProductDetailsState();
+  ProductDetailsState createState() => ProductDetailsState();
 }
 
-class _ProductDetailsState extends State<ProductDetails> {
+class ProductDetailsState extends State<ProductDetails> {
   // Function to add product to the cart
   Future<void> addToCart() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
@@ -143,9 +143,6 @@ class _ProductDetailsState extends State<ProductDetails> {
                     enlargeCenterPage: true,
                     viewportFraction: 0.8,
                     enlargeStrategy: CenterPageEnlargeStrategy.height,
-                    onPageChanged: (val, carouselPageChangedReason) {
-                      setState(() {});
-                    },
                   ),
                 ),
               ),

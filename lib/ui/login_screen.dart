@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_shop/ui/AppColors.dart';
 import 'package:smart_shop/ui/bottom_nav_controller.dart';
+import 'package:smart_shop/ui/forgetPassword.dart';
 import 'package:smart_shop/ui/registration_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -81,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     Text(
                       "Welcome Back",
-                      style: TextStyle(fontSize: 28.sp, color: Colors.black),
+                      style: TextStyle(fontSize: 28.sp, color: Colors.white),
                     ),
                   ],
                 ),
@@ -216,6 +217,32 @@ class _LoginScreenState extends State<LoginScreen> {
                                           )),
                                 ),
                               ),
+                            ),
+                          ],
+                        ),
+                        // forgot password
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            GestureDetector(
+                              child: Padding(
+                                padding: EdgeInsets.only(top: 10.h),
+                                child: Text(
+                                  "Forgot Password?",
+                                  style: TextStyle(
+                                    fontSize: 13.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.deep_blue,
+                                  ),
+                                ),
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                        builder: (context) =>
+                                            const ForgetPassword()));
+                              },
                             ),
                           ],
                         ),

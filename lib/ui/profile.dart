@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:smart_shop/ui/AppColors.dart';
@@ -62,6 +63,10 @@ class _ProfileState extends State<Profile> {
               borderRadius: BorderRadius.circular(15.0),
             ),
           ),
+          keyboardType: TextInputType.number,
+          inputFormatters: <TextInputFormatter>[
+            FilteringTextInputFormatter.digitsOnly
+          ],
         ),
         const SizedBox(height: 20),
         TextFormField(
@@ -77,6 +82,10 @@ class _ProfileState extends State<Profile> {
               borderRadius: BorderRadius.circular(15.0),
             ),
           ),
+          keyboardType: TextInputType.number,
+          inputFormatters: <TextInputFormatter>[
+            FilteringTextInputFormatter.digitsOnly
+          ],
         ),
         const SizedBox(height: 30),
         SizedBox(

@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void _checkUserLoginStatus() {
     Timer(
       const Duration(seconds: 2),
-          () {
+      () {
         User? user = FirebaseAuth.instance.currentUser;
 
         // If the user is logged in, go to the BottomNavController (home screen)
@@ -64,9 +64,9 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                   SizedBox(height: 10.h),
                   Text(
-                    "My Smart Shop",
+                    "Smart Shop",
                     style: TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontWeight: FontWeight.w600,
                       fontSize: 40.sp,
                     ),

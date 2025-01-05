@@ -1,13 +1,16 @@
 import 'dart:convert'; // For JSON decoding
 import 'dart:typed_data'; // For handling image bytes
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:smart_shop/models/similar/widgets/product_grid_view.dart';
 import 'package:smart_shop/models/similar/widgets/selected_image_widget.dart';
 import 'package:smart_shop/models/similar/widgets/send_image_button.dart';
+import 'package:smart_shop/ui/AppColors.dart';
 import 'package:smart_shop/ui/product_details_screen.dart';
 
 class SimilarScreen extends StatefulWidget {
@@ -23,23 +26,70 @@ class _SimilarScreenState extends State<SimilarScreen> {
       false; // Indicates if the request for similar products is in progress
   bool isImageLoading = false; // Indicates if image upload is in progress
 
-  /// Pick an image from the gallery
-  Future<void> _pickImage() async {
+  // Method to show the bottom sheet for selecting camera or gallery
+  void _showImageSourceSelection(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return _buildBottomSheetContent(
+          context,
+          'Select an image source',
+          (ImageSource source) {
+            _pickImage(source);
+          },
+        );
+      },
+    );
+  }
+
+  /// Pick an image from the selected source (camera or gallery)
+  Future<void> _pickImage(ImageSource source) async {
     try {
       final picker = ImagePicker();
-      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+      final XFile? image = await picker.pickImage(source: source);
 
       if (image != null) {
+        setState(() {
+          isImageLoading =
+              true; // Start loading indicator while processing image
+        });
         final imageBytes = await image.readAsBytes();
         setState(() {
           selectedImageBytes = imageBytes;
           selectedImageName = image.name;
+          isImageLoading = false; // Stop loading after image is loaded
         });
         print('Image selected: ${image.name}');
       }
     } catch (e) {
+      setState(() {
+        isImageLoading = false; // Ensure loading stops on error
+      });
       print('Error picking image: $e');
     }
+  }
+
+  /// Compress the image to be less than 200KB
+  Future<Uint8List> _compressImage(Uint8List imageBytes) async {
+    return await compute(_compressImageSync, imageBytes);
+  }
+
+  static Uint8List _compressImageSync(Uint8List imageBytes) {
+    img.Image? image = img.decodeImage(imageBytes);
+    if (image == null) return imageBytes;
+
+    int quality = 100;
+    Uint8List compressedBytes =
+        Uint8List.fromList(img.encodeJpg(image, quality: quality));
+
+    while (compressedBytes.length > 200 * 1024 && quality > 10) {
+      quality -= 10;
+      compressedBytes =
+          Uint8List.fromList(img.encodeJpg(image, quality: quality));
+    }
+    print('Compressed image size: ${compressedBytes.length} bytes');
+
+    return compressedBytes;
   }
 
   /// Send the selected image to the server
@@ -54,6 +104,10 @@ class _SimilarScreenState extends State<SimilarScreen> {
     });
 
     try {
+      // Compress the image
+      Uint8List compressedImageBytes =
+          await _compressImage(selectedImageBytes!);
+
       // Get server URL from Firestore
       DocumentSnapshot doc = await FirebaseFirestore.instance
           .collection('Permission')
@@ -72,7 +126,7 @@ class _SimilarScreenState extends State<SimilarScreen> {
         request.files.add(
           http.MultipartFile.fromBytes(
             'file', // Key for the file
-            selectedImageBytes!, // Image bytes
+            compressedImageBytes, // Compressed image bytes
             filename: selectedImageName,
             contentType: MediaType('image', 'jpeg'), // JPEG image
           ),
@@ -161,9 +215,13 @@ class _SimilarScreenState extends State<SimilarScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SelectedImageWidget(
-              selectedImageBytes: selectedImageBytes,
-              onPickImage: _pickImage,
+            GestureDetector(
+              onTap: () => _showImageSourceSelection(
+                  context), // Tap to choose image source
+              child: SelectedImageWidget(
+                selectedImageBytes: selectedImageBytes,
+                onPickImage: () => _showImageSourceSelection(context),
+              ),
             ),
             SizedBox(height: 20),
             SendImageButton(
@@ -193,6 +251,42 @@ class _SimilarScreenState extends State<SimilarScreen> {
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildBottomSheetContent(
+      BuildContext context, String text, Function(ImageSource) onSelect) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            text,
+            style: const TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+          ),
+          const SizedBox(height: 20),
+          ListTile(
+            leading: const Icon(Icons.camera_alt,
+                color: AppColors.splash_colors), // Color icon to match theme
+            title: const Text('Camera', style: TextStyle(color: Colors.black)),
+            onTap: () {
+              Navigator.pop(context);
+              onSelect(ImageSource.camera);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.photo,
+                color: AppColors.splash_colors), // Color icon to match theme
+            title: const Text('Gallery', style: TextStyle(color: Colors.black)),
+            onTap: () {
+              Navigator.pop(context);
+              onSelect(ImageSource.gallery);
+            },
+          ),
+        ],
       ),
     );
   }

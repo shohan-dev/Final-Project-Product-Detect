@@ -15,14 +15,14 @@ class SendImageButton extends StatelessWidget {
     return selectedImageBytes != null
         ? ElevatedButton(
             onPressed: onSendImage,
-            child: Text(
+            child:  Text(
               'Send Image',
               style: TextStyle(fontSize: 16, color: Colors.white),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF615EFC),
+              backgroundColor: const Color(0xFF615EFC),
             ),
           )
-        : SizedBox.shrink();
+        : const SizedBox.shrink();
   }
 }

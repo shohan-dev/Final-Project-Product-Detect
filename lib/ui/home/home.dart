@@ -57,24 +57,28 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Obx(() => controller.carouselImages.isEmpty &&
-              controller.products.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(child: _buildSearchBar(context)),
-                SliverToBoxAdapter(child: _buildCarousel()),
-                SliverToBoxAdapter(
-                    child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: const Text(
-                    "Products",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+      body: Obx(
+          () => controller.carouselImages.isEmpty && controller.products.isEmpty
+              ? const Center(child: CircularProgressIndicator())
+              : CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(child: _buildSearchBar(context)),
+                    SliverToBoxAdapter(child: _buildCarousel()),
+                    const SliverToBoxAdapter(
+                        child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: Padding(
+                        padding: EdgeInsets.all(5.0),
+                        child: Text(
+                          "Products",
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    )),
+                    _buildGridProductList(),
+                  ],
                 )),
-                _buildGridProductList(),
-              ],
-            )),
     );
   }
 
