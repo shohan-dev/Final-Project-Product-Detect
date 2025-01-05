@@ -1,9 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-class ProductDetails extends StatelessWidget {
+class ProductDetailsHome extends StatelessWidget {
   final Map<String, dynamic> product;
-  const ProductDetails(this.product, {super.key});
+  const ProductDetailsHome(this.product, {super.key});
 
   @override
   Widget build(BuildContext context) {

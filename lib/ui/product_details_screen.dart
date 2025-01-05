@@ -26,6 +26,7 @@ class _ProductDetailsState extends State<ProductDetails> {
       "name": widget.product["product-name"],
       "price": widget.product["product-price"],
       "images": widget.product["product-img"],
+      "decresption": widget.product["product-description"],
     }).then((value) => Fluttertoast.showToast(msg: "Added to cart"));
   }
 
@@ -39,6 +40,7 @@ class _ProductDetailsState extends State<ProductDetails> {
       "name": widget.product["product-name"],
       "price": widget.product["product-price"],
       "images": widget.product["product-img"],
+      "decresption": widget.product["product-description"],
     }).then((value) => Fluttertoast.showToast(msg: "Added to favourite"));
   }
 

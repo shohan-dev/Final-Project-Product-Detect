@@ -168,7 +168,7 @@ class _BottomNavControllerState extends State<BottomNavController>
       return Stack(
         clipBehavior: Clip.none,
         children: [
-          _buildBottomNavItem(Icons.shopping_cart, "Shop", 1),
+          _buildBottomNavItem(Icons.shopping_cart, "Cart", 1),
           if (cartCount > 0)
             Positioned(
               top: -4,
