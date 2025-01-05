@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:smart_shop/models/other/next_page.dart';
 import 'package:smart_shop/ui/AppColors.dart';
+import 'package:smart_shop/ui/Controller/count.dart';
 import 'package:smart_shop/ui/cart.dart';
 import 'package:smart_shop/ui/favourite.dart';
-import 'package:smart_shop/ui/home.dart';
-import 'package:smart_shop/ui/login_screen.dart'; // Ensure this import is correct
+import 'package:smart_shop/ui/home/home.dart';
+import 'package:smart_shop/ui/login_screen.dart';
 import 'package:smart_shop/ui/profile.dart';
 
 class BottomNavController extends StatefulWidget {
@@ -18,17 +20,17 @@ class BottomNavController extends StatefulWidget {
 class _BottomNavControllerState extends State<BottomNavController>
     with SingleTickerProviderStateMixin {
   final _pages = [
-    const Home(),
-    const Favourite(),
+    Home(),
     const Cart(),
+    const Favourite(),
     const Profile(),
   ];
 
-  var _currentIndex = 0;
+  int _currentIndex = 0;
   late AnimationController _animationController;
 
   // Simulate login status (replace with actual authentication logic)
-  bool isLoggedIn = true; // Change this to reflect actual login status
+  final bool isLoggedIn = true;
 
   @override
   void initState() {
@@ -47,6 +49,8 @@ class _BottomNavControllerState extends State<BottomNavController>
 
   @override
   Widget build(BuildContext context) {
+    final countController = Get.put(CountProduct());
+
     return isLoggedIn
         ? Scaffold(
             backgroundColor: Colors.grey[200],
@@ -56,10 +60,7 @@ class _BottomNavControllerState extends State<BottomNavController>
               title: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.shopping_cart,
-                    color: Colors.white,
-                  ),
+                  Icon(Icons.shopping_cart, color: Colors.white),
                   SizedBox(width: 10),
                   Text(
                     "Smart Shop",
@@ -80,9 +81,7 @@ class _BottomNavControllerState extends State<BottomNavController>
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const NextPage(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const NextPage()),
                 );
               },
               backgroundColor: AppColors.deep_blue,
@@ -91,25 +90,17 @@ class _BottomNavControllerState extends State<BottomNavController>
               child: const Icon(Iconsax.scan),
             ),
             bottomNavigationBar: BottomAppBar(
-              notchMargin: 10.0,
+              notchMargin: 8.0,
               shape: const CircularNotchedRectangle(),
               color: AppColors.deep_blue,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Expanded(
-                    child: _buildBottomNavItem(Icons.home, "Home", 0),
-                  ),
-                  Expanded(
-                    child: _buildBottomNavItem(Icons.shopping_cart, "Shop", 1),
-                  ),
-                  const SizedBox(width: 48), // Space for the FAB
-                  Expanded(
-                    child: _buildBottomNavItem(Icons.favorite, "Favorite", 2),
-                  ),
-                  Expanded(
-                    child: _buildBottomNavItem(Iconsax.user, "Profile", 3),
-                  ),
+                  _buildBottomNavItem(Icons.home, "Home", 0),
+                  _buildCartNavItem(countController),
+                  const SizedBox(width: 48), // Space for FAB
+                  _buildFavoriteNavItem(countController),
+                  _buildBottomNavItem(Iconsax.user, "Profile", 3),
                 ],
               ),
             ),
@@ -131,12 +122,12 @@ class _BottomNavControllerState extends State<BottomNavController>
             ),
           )
         : const Scaffold(
-            body: LoginScreen(), // Only show the login page if not logged in
+            body: LoginScreen(),
           );
   }
 
   Widget _buildBottomNavItem(IconData icon, String label, int index) {
-    bool isSelected = _currentIndex == index;
+    final bool isSelected = _currentIndex == index;
 
     return GestureDetector(
       onTap: () {
@@ -167,6 +158,65 @@ class _BottomNavControllerState extends State<BottomNavController>
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildCartNavItem(CountProduct countController) {
+    return Obx(() {
+      final int cartCount = countController.cartProductscount.value;
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          _buildBottomNavItem(Icons.shopping_cart, "Shop", 1),
+          if (cartCount > 0)
+            Positioned(
+              top: -4,
+              right: 23,
+              child: _buildBadge(cartCount),
+            ),
+        ],
+      );
+    });
+  }
+
+  Widget _buildFavoriteNavItem(CountProduct countController) {
+    return Obx(() {
+      final int favoriteCount = countController.favoriteProductscount.value;
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          _buildBottomNavItem(Icons.favorite, "Favorite", 2),
+          if (favoriteCount > 0)
+            Positioned(
+              top: -4,
+              right: 30,
+              child: _buildBadge(favoriteCount),
+            ),
+        ],
+      );
+    });
+  }
+
+  Widget _buildBadge(int count) {
+    return Container(
+      padding: const EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        color: Colors.red,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      constraints: const BoxConstraints(
+        minWidth: 16,
+        minHeight: 16,
+      ),
+      child: Text(
+        '$count',
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+        ),
+        textAlign: TextAlign.center,
       ),
     );
   }

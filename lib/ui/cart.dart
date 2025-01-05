@@ -13,7 +13,7 @@ class _CartState extends State<Cart> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: fetchData("users-cart-items"),
+        child: fetchData("users-cart-items", iscart: true),
       ),
     );
   }
