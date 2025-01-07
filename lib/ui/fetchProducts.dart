@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:smart_shop/ui/product_details_screen.dart';
 
 Widget fetchData(String collectionName, {bool iscart = false}) {
@@ -176,20 +178,14 @@ Widget fetchData(String collectionName, {bool iscart = false}) {
                         ),
                         onTap: () {
                           // Navigate to ProductDetails page and pass the product data
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ProductDetails(
-                                {
-                                  'product-name': documentSnapshot['name'],
-                                  'product-price': documentSnapshot['price'],
-                                  'product-img': documentSnapshot['images'],
-                                  'product-description':
-                                      documentSnapshot['decresption'],
-                                },
-                              ),
-                            ),
-                          );
+                          // Replacing the entire stack with ProductDetails
+                          Get.to(() => ProductDetails({
+                                'product-name': documentSnapshot['name'],
+                                'product-price': documentSnapshot['price'],
+                                'product-img': documentSnapshot['images'],
+                                'product-description':
+                                    documentSnapshot['decresption'],
+                              }));
                         },
                       ),
                     ),

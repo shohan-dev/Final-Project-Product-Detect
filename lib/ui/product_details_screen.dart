@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart'; // Import Fluttertoast
 import 'package:get/get.dart';
 import 'package:smart_shop/ui/AppColors.dart';
+import 'package:smart_shop/ui/bottom_nav_controller.dart';
 import 'package:smart_shop/ui/cart.dart';
 
 class ProductDetails extends StatefulWidget {
@@ -69,154 +70,162 @@ class ProductDetailsState extends State<ProductDetails> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: SecondaryColors.secondary_colors,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: CircleAvatar(
-            backgroundColor: AppColors.deep_blue,
-            child: IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
+    return WillPopScope(
+      onWillPop: () async {
+        Get.offAll(() => const BottomNavController());
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: SecondaryColors.secondary_colors,
+          elevation: 0,
+          leading: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: CircleAvatar(
+              backgroundColor: AppColors.deep_blue,
+              child: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+              ),
             ),
           ),
-        ),
-        actions: [
-          StreamBuilder(
-            stream: FirebaseFirestore.instance
-                .collection("users-favourite-items")
-                .doc(FirebaseAuth.instance.currentUser!.email)
-                .collection("items")
-                .where("name", isEqualTo: widget.product['product-name'])
-                .snapshots(),
-            builder:
-                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (snapshot.hasData) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.red,
-                    child: IconButton(
-                      onPressed: () => snapshot.data!.docs.isEmpty
-                          ? addToFavourite()
-                          : removeFromFavourite(),
-                      icon: snapshot.data!.docs.isEmpty
-                          ? const Icon(Icons.favorite_outline,
-                              color: Colors.white)
-                          : const Icon(Icons.favorite, color: Colors.white),
+          actions: [
+            StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection("users-favourite-items")
+                  .doc(FirebaseAuth.instance.currentUser!.email)
+                  .collection("items")
+                  .where("name", isEqualTo: widget.product['product-name'])
+                  .snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasData) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: CircleAvatar(
+                      backgroundColor: Colors.red,
+                      child: IconButton(
+                        onPressed: () => snapshot.data!.docs.isEmpty
+                            ? addToFavourite()
+                            : removeFromFavourite(),
+                        icon: snapshot.data!.docs.isEmpty
+                            ? const Icon(Icons.favorite_outline,
+                                color: Colors.white)
+                            : const Icon(Icons.favorite, color: Colors.white),
+                      ),
                     ),
-                  ),
-                );
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            },
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AspectRatio(
-                aspectRatio: 1.5,
-                child: CarouselSlider(
-                  items: widget.product['product-img']
-                      .map<Widget>((item) => Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: NetworkImage(item),
-                                  fit: BoxFit.contain,
+                  );
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
+          ],
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AspectRatio(
+                  aspectRatio: 1.5,
+                  child: CarouselSlider(
+                    items: widget.product['product-img']
+                        .map<Widget>((item) => Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: NetworkImage(item),
+                                    fit: BoxFit.contain,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ))
-                      .toList(),
-                  options: CarouselOptions(
-                    autoPlay: false,
-                    enlargeCenterPage: true,
-                    viewportFraction: 0.8,
-                    enlargeStrategy: CenterPageEnlargeStrategy.height,
+                            ))
+                        .toList(),
+                    options: CarouselOptions(
+                      autoPlay: false,
+                      enlargeCenterPage: true,
+                      viewportFraction: 0.8,
+                      enlargeStrategy: CenterPageEnlargeStrategy.height,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                widget.product['product-name'],
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
-              ),
-              Text(widget.product['product-description']),
-              const SizedBox(height: 20),
-              Text(
-                "Price: ${widget.product['product-price'].toString()} ৳",
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Colors.red),
-              ),
-              const SizedBox(height: 20),
-              // Use StreamBuilder to listen for cart updates in real-time
-              StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection("users-cart-items")
-                    .doc(FirebaseAuth.instance.currentUser!.email)
-                    .collection("items")
-                    .where("name", isEqualTo: widget.product['product-name'])
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+                const SizedBox(height: 10),
+                Text(
+                  widget.product['product-name'],
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 25),
+                ),
+                Text(widget.product['product-description']),
+                const SizedBox(height: 20),
+                Text(
+                  "Price: ${widget.product['product-price'].toString()} ৳",
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Colors.red),
+                ),
+                const SizedBox(height: 20),
+                // Use StreamBuilder to listen for cart updates in real-time
+                StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection("users-cart-items")
+                      .doc(FirebaseAuth.instance.currentUser!.email)
+                      .collection("items")
+                      .where("name", isEqualTo: widget.product['product-name'])
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-                  // If the product is already in the cart, show "Go to Cart"
-                  if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
-                    return SizedBox(
-                      width: double.infinity,
-                      height: 50.h,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Get.to(() => const Cart());
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.deep_blue,
-                          elevation: 3,
+                    // If the product is already in the cart, show "Go to Cart"
+                    if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                      return SizedBox(
+                        width: double.infinity,
+                        height: 50.h,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Get.to(() => const Cart());
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.deep_blue,
+                            elevation: 3,
+                          ),
+                          child: Text(
+                            "Go to Cart",
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 18.sp),
+                          ),
                         ),
-                        child: Text(
-                          "Go to Cart",
-                          style:
-                              TextStyle(color: Colors.white, fontSize: 18.sp),
+                      );
+                    } else {
+                      // If the product is not in the cart, show "Add to Cart"
+                      return SizedBox(
+                        width: double.infinity,
+                        height: 50.h,
+                        child: ElevatedButton(
+                          onPressed: () => addToCart(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.deep_blue,
+                            elevation: 3,
+                          ),
+                          child: Text(
+                            "Add to Cart",
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 18.sp),
+                          ),
                         ),
-                      ),
-                    );
-                  } else {
-                    // If the product is not in the cart, show "Add to Cart"
-                    return SizedBox(
-                      width: double.infinity,
-                      height: 50.h,
-                      child: ElevatedButton(
-                        onPressed: () => addToCart(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.deep_blue,
-                          elevation: 3,
-                        ),
-                        child: Text(
-                          "Add to Cart",
-                          style:
-                              TextStyle(color: Colors.white, fontSize: 18.sp),
-                        ),
-                      ),
-                    );
-                  }
-                },
-              ),
-            ],
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

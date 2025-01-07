@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -36,7 +38,17 @@ class HomeController extends GetxController {
 
   void fetchProducts() async {
     try {
+      // random number generation 1 - 450
+      final random = Random();
+      final randomNumber = random.nextInt(450) + 1;
+
       QuerySnapshot qn = await _firestoreInstance.collection("products").get();
+      qn = await _firestoreInstance
+          .collection("products")
+          .orderBy(FieldPath.documentId)
+          .startAt([randomNumber.toString()])
+          .limit(20)
+          .get();
       products.value = qn.docs.map((doc) {
         return {
           "product-name": doc["product-name"],

@@ -22,9 +22,31 @@ class _SimilarScreenState extends State<SimilarScreen> {
   Uint8List? selectedImageBytes;
   String? selectedImageName;
   List<Map<String, dynamic>>? products;
-  bool isLoading =
-      false; // Indicates if the request for similar products is in progress
-  bool isImageLoading = false; // Indicates if image upload is in progress
+  bool isLoading = false;
+  bool isImageLoading = false;
+
+  // serverUrl get
+  Future<bool> getServerresponse() async {
+    DocumentSnapshot doc = await FirebaseFirestore.instance
+        .collection('Permission')
+        .doc('fTH5LwJQqAZwvtlRnfzu')
+        .get();
+
+    final data = doc.data() as Map<String, dynamic>?;
+
+    if (data != null && data.containsKey('Server')) {
+      final serverUrl = data['Server'];
+      final response = await http.get(Uri.parse('$serverUrl/health'));
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
 
   // Method to show the bottom sheet for selecting camera or gallery
   void _showImageSourceSelection(BuildContext context) {
@@ -199,58 +221,87 @@ class _SimilarScreenState extends State<SimilarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Find Similar Products',
+        title: const Text('Find Similar Products',
             style: TextStyle(color: Colors.white)),
-        backgroundColor: Color(0xFF615EFC),
-        // backbutton white color
+        backgroundColor: const Color(0xFF615EFC),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            GestureDetector(
-              onTap: () => _showImageSourceSelection(
-                  context), // Tap to choose image source
-              child: SelectedImageWidget(
-                selectedImageBytes: selectedImageBytes,
-                onPickImage: () => _showImageSourceSelection(context),
-              ),
+      body: FutureBuilder<bool>(
+        future: getServerresponse(),
+        builder: (context, snapshot) {
+          // Show loading screen while waiting for the response
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+                child: CircularProgressIndicator(color: Color(0xFF615EFC)));
+          }
+
+          // Check for error or false response
+          if (snapshot.hasError ||
+              !snapshot.hasData ||
+              snapshot.data == false) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Server is unavailable')),
+              );
+            });
+            return const Center(
+                child: Text('Server is unavailable',
+                    style: TextStyle(fontSize: 18)));
+          }
+
+          // Response is successful
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                GestureDetector(
+                  onTap: () => _showImageSourceSelection(
+                      context), // Tap to choose image source
+                  child: SelectedImageWidget(
+                    selectedImageBytes: selectedImageBytes,
+                    onPickImage: () => _showImageSourceSelection(context),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SendImageButton(
+                  onSendImage: _sendImage,
+                  selectedImageBytes: selectedImageBytes,
+                ),
+                const SizedBox(height: 20),
+                if (isImageLoading)
+                  const Center(
+                      child:
+                          CircularProgressIndicator(color: Color(0xFF615EFC)))
+                else if (isLoading)
+                  const Center(
+                      child:
+                          CircularProgressIndicator(color: Color(0xFF615EFC)))
+                else if (products == null || products!.isEmpty)
+                  const Center(
+                      child: Text('No products found',
+                          style: TextStyle(fontSize: 18)))
+                else
+                  ProductGridView(
+                    products: products!,
+                    onProductTap: (product) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProductDetails(product),
+                        ),
+                      );
+                    },
+                  ),
+              ],
             ),
-            SizedBox(height: 20),
-            SendImageButton(
-              onSendImage: _sendImage,
-              selectedImageBytes: selectedImageBytes,
-            ),
-            SizedBox(height: 20),
-            if (isImageLoading)
-              Center(child: CircularProgressIndicator(color: Color(0xFF615EFC)))
-            else if (isLoading)
-              Center(child: CircularProgressIndicator(color: Color(0xFF615EFC)))
-            else if (products == null || products!.isEmpty)
-              Center(
-                  child:
-                      Text('No products found', style: TextStyle(fontSize: 18)))
-            else
-              ProductGridView(
-                products: products!,
-                onProductTap: (product) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProductDetails(product),
-                    ),
-                  );
-                },
-              ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

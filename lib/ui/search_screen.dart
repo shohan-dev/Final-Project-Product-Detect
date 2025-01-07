@@ -63,7 +63,14 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   List<QueryDocumentSnapshot> _searchProducts(String query) {
-    if (query.isEmpty) return allProducts.take(10).toList();
+    // if (query.isEmpty) {
+    //   // Shuffle the list of products and take the first 20 products
+    //   List<QueryDocumentSnapshot> randomProducts = List.from(allProducts)
+    //     ..shuffle();
+    //   return randomProducts.take(20).toList();
+    // }
+    if (query.isEmpty) return allProducts.take(20).toList();
+
     return allProducts.where((document) {
       Map<String, dynamic> data = document.data() as Map<String, dynamic>;
       String productName =

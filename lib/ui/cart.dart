@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:smart_shop/ui/bottom_nav_controller.dart';
 import 'package:smart_shop/ui/fetchProducts.dart';
 
 class Cart extends StatefulWidget {
@@ -11,9 +13,16 @@ class Cart extends StatefulWidget {
 class _CartState extends State<Cart> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: fetchData("users-cart-items", iscart: true),
+    // ignore: deprecated_member_use
+    return WillPopScope(
+      onWillPop: () async {
+        Get.offAll(() => const BottomNavController());
+        return true;
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: fetchData("users-cart-items", iscart: true),
+        ),
       ),
     );
   }
